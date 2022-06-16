@@ -32,6 +32,9 @@ func LogRequest(handler http.Handler) http.HandlerFunc {
 
 func UploadFileHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// limit upload size
+		r.Body = http.MaxBytesReader(w, r.Body, 2*512*1024)
+
 		// serve webpage for testing
 		if r.Method == "GET" {
 			t, _ := template.ParseFiles("upload.html")
@@ -157,7 +160,7 @@ func parseScale(r *http.Request) (float64, error) {
 }
 
 // TODO: Eventually, UserID could be present in the request context as key/value
-// pair. This key/value pair could in turn be populate by a middleware that
+// pair. This key/value pair could in turn be populated by a middleware that
 // performs *actual* authentication e.g. via JWT
 func parseUserID(r *http.Request) (string, error) {
 	userIDRaw, ok := r.URL.Query()["userid"]
